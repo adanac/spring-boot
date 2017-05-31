@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.congyh.seckill.dao.SeckillProductDAO">
+    <!--开启二级缓存支持-->
+    <cache />
+    <resultMap id="seckillProductDO" type="SeckillProductDO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="number" property="number"/>
+        <result column="gmt_start" property="gmtStart"/>
+        <result column="gmt_end" property="gmtEnd"/>
+    </resultMap>
+
+    <update id="reduceNumber" flushCache="true">
+        UPDATE seckill_boot.seckill_product SET
+            number = number - 1,
+            gmt_modified = current_timestamp
+        WHERE id = #{id}
+        and gmt_start <![CDATA[<=]]> #{gmtKill}
+        and gmt_end >= #{gmtKill}
+        and number > 0
+    </update>
+
+    <select id="findById" resultMap="seckillProductDO" useCache="true">
+        select id, name, number, gmt_start, gmt_end
+        FROM  seckill_boot.seckill_product
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="seckillProductDO" useCache="true">
+        select id, name, number, gmt_start, gmt_end
+        FROM seckill_boot.seckill_product
+        ORDER BY gmt_create DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+</mapper>
+
